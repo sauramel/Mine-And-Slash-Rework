@@ -46,7 +46,6 @@ public class BackpackScreen extends AbstractContainerScreen<BackpackMenu> {
         mouseHandler.setYPos(iMouseY);
         //from MouseHandler.class releaseMouse()
         InputConstants.grabOrReleaseMouse(this.minecraft.getWindow().getWindow(), 212993, iMouseX, iMouseY);
-        System.out.println("init!");
     }
 
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
