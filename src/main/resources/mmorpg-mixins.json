@@ -26,7 +26,8 @@
     "AccessorRenderType",
     "ItemGlintMixin",
     "ItemStackMixin",
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "MouseHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

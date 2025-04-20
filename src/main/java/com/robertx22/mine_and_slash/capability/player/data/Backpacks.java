@@ -106,7 +106,7 @@ public class Backpacks {
             if (type.isValid(stack)) {
                 var bag = getInv(type);
 
-                if (bag.hasFreeSlots()) {
+                if (bag.canAddItem(stack)) {
                     bag.addItem(stack.copy());
                     stack.shrink(stack.getCount() + 10); // just in case
                     SoundUtils.playSound(this.player, SoundEvents.ITEM_PICKUP);

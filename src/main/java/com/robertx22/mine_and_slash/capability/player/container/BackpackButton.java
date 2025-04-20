@@ -23,9 +23,6 @@ public class BackpackButton extends ImageButton {
 
     public BackpackButton(Backpacks.BackpackType type, int xPos, int yPos) {
         super(xPos, yPos, SX, SY, 0, 0, SY, new ResourceLocation("empty"), (button) -> {
-            //MOUSEPOS.X = Minecraft.getInstance().mouseHandler.xpos(); todo this isnt working for some reason
-            //MOUSEPOS.Y = Minecraft.getInstance().mouseHandler.ypos();
-            //MOUSEPOS.SET_MOUSE = true;
             Packets.sendToServer(new OpenBackpackPacket(type));
         });
         this.type = type;
@@ -45,6 +42,13 @@ public class BackpackButton extends ImageButton {
         gui.setColor(1.0F, 1.0F, 1.0F, 1.0F);
         gui.blit(tex, getX(), getY(), SX, SX, SX, SX, SX, SX);
 
+    }
+
+    @Override
+    public void onClick(double pMouseX, double pMouseY) {
+        BackpackScreen.iMouseX = Minecraft.getInstance().mouseHandler.xpos();
+        BackpackScreen.iMouseY = Minecraft.getInstance().mouseHandler.ypos();
+        super.onClick(pMouseX, pMouseY);
     }
 
     public void setModTooltip() {

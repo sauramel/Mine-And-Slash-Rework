@@ -121,7 +121,7 @@ public class PlayerConfigData {
 
                 if (doSalvage) {
                     SoundUtils.playSound(player, SoundEvents.EXPERIENCE_ORB_PICKUP, 0.75F, 1.25F);
-                    stack.shrink(100);
+                    stack.shrink(stack.getCount() + 100);
                     data.getSalvageResult(ex).forEach(e -> {
                         Backpacks backpacks = Load.backpacks(player).getBackpacks();
                         //copy tryAutoPickup() but without playing sound
@@ -130,7 +130,7 @@ public class PlayerConfigData {
                                 if (type.isValid(e)) {
                                     var bag = backpacks.getInv(type);
 
-                                    if (bag.hasFreeSlots()) {
+                                    if (bag.canAddItem(e)) {
                                         bag.addItem(e.copy());
                                         e.shrink(e.getCount() + 10);
                                     } else {
@@ -142,7 +142,8 @@ public class PlayerConfigData {
                         } else {
                             PlayerUtils.giveItem(e, player);
                         }
-                        backpacks.tryAutoPickup(player, stack);
+                        //idk why I retained this but this seems redundant already, considering the stack was shrunk by stack.getCount() + 100.
+                        //backpacks.tryAutoPickup(player, stack);
                     });
                     return true;
                 }
