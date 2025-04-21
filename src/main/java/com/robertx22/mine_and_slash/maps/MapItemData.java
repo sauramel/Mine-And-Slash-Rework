@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.robertx22.library_of_exile.utils.ItemstackDataSaver;
 import com.robertx22.mine_and_slash.aoe_data.database.stats.OffenseStats;
+import com.robertx22.mine_and_slash.config.forge.ServerContainer;
 import com.robertx22.mine_and_slash.database.data.game_balance_config.GameBalanceConfig;
 import com.robertx22.mine_and_slash.database.data.rarities.GearRarity;
 import com.robertx22.mine_and_slash.database.data.stats.types.generated.ElementalResist;
@@ -152,6 +153,12 @@ public class MapItemData implements ICommonDataItem<GearRarity> {
     public List<Component> getTooltip(ExileStack stack) {
 
         int lvl = Load.Unit(ClientOnly.getPlayer()).getLevel();
+
+        int min = ServerContainer.get().MIN_LEVEL_MAP_DROPS.get();
+
+        if (lvl < min) {
+            lvl = min;
+        }
 
         MapItemData thisMapItemData = this;
         StatRangeInfo tooltipInfo = new StatRangeInfo(ModRange.of(getRarity().stat_percents));

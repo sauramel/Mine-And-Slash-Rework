@@ -1,13 +1,13 @@
 package com.robertx22.mine_and_slash.database.data.spells.summons.entity;
 
+import com.robertx22.library_of_exile.utils.SoundUtils;
+import com.robertx22.library_of_exile.utils.geometry.MyPosition;
 import com.robertx22.mine_and_slash.capability.player.data.PlayerConfigData;
 import com.robertx22.mine_and_slash.database.data.spells.components.ProjectileCastHelper;
 import com.robertx22.mine_and_slash.database.data.spells.entities.AutoAimingProj;
 import com.robertx22.mine_and_slash.mmorpg.registers.common.SlashEntities;
 import com.robertx22.mine_and_slash.uncommon.datasaving.Load;
 import com.robertx22.mine_and_slash.uncommon.utilityclasses.AllyOrEnemy;
-import com.robertx22.library_of_exile.utils.SoundUtils;
-import com.robertx22.library_of_exile.utils.geometry.MyPosition;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.*;
@@ -121,16 +121,17 @@ public abstract class SummonEntity extends TamableAnimal implements RangedAttack
             this.goalSelector.addGoal(5, new RangedBowAttackGoal<>(this, 1.0D, 20, 15F));
         }
 
-        this.goalSelector.addGoal(6, new RandomSwimmingGoal(this, 1, 1));
+        // this.goalSelector.addGoal(6, new RandomSwimmingGoal(this, 1, 1));
         this.goalSelector.addGoal(7, new FollowOwnerGoal(this, 1.0D, 6.0F, 1.0F, false));
         this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(10, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(10, new RandomLookAroundGoal(this));
         //this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
 
-
         this.targetSelector.addGoal(3, new OwnerHurtByTargetGoal(this));
         this.targetSelector.addGoal(4, new OwnerHurtTargetGoal(this));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false, x -> canAttack(x)));
+
     }
 
     public Entity focusEntity = null;

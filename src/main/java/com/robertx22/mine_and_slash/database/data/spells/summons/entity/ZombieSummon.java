@@ -8,5 +8,4 @@ public class ZombieSummon extends SummonEntity {
         super(pEntityType, pLevel);
     }
 
-
 }
