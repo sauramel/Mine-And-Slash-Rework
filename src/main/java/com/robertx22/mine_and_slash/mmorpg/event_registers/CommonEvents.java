@@ -43,6 +43,7 @@ import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.*;
+import net.minecraftforge.eventbus.api.EventPriority;
 
 public class CommonEvents {
 
@@ -166,7 +167,8 @@ public class CommonEvents {
                     }
                 }
             }
-        });
+        }, EventPriority.HIGHEST);
+
         ForgeEvents.registerForgeEvent(PlayerEvent.Clone.class, event ->
 
         {
