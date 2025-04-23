@@ -8,9 +8,9 @@ import com.robertx22.mine_and_slash.uncommon.datasaving.Load;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.Slot;
-import net.minecraftforge.client.event.sound.SoundEvent;
 
 public class BackPackLootMenuPacket extends MyPacket<BackPackLootMenuPacket> {
     @Override
@@ -34,6 +34,7 @@ public class BackPackLootMenuPacket extends MyPacket<BackPackLootMenuPacket> {
             Backpacks backpacks = Load.backpacks(player).getBackpacks();
             if (player.hasContainerOpen() && player.containerMenu instanceof ChestMenu chestMenu) {
                 for (Slot slot : chestMenu.slots) {
+                    if (slot.container instanceof Inventory) continue;
                     backpacks.tryAutoPickup(player, slot.getItem(), false);
                 }
             }
