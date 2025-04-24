@@ -19,7 +19,7 @@ public class SpellKeybind {
     boolean firstbar;
 
     public SpellKeybind(int num, int key, KeyModifier mod, boolean firstbar) {
-        this.key = new KeyMapping("spell_" + num, key, KeybindsRegister.CATEGORY);
+        this.key = new KeyMapping(KeybindsRegister.prefix + "spell_" + num, key, KeybindsRegister.CATEGORY);
         this.firstbar = firstbar;
         if (mod != null) {
             // todo will this work
