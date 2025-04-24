@@ -37,6 +37,7 @@ public class QuickUsePotionPacket extends MyPacket<QuickUsePotionPacket> {
     public void onReceived(ExilePacketContext exilePacketContext) {
         if (exilePacketContext.getPlayer() instanceof ServerPlayer player) {
             List<ItemStack> potionItems = new ArrayList<>();
+            //get all kinds of SlashPotionItem in player's inventory.
             for (Slot slot : player.inventoryMenu.slots) {
                 if (slot.getItem().getItem() instanceof SlashPotionItem) {
                     potionItems.add(slot.getItem());
@@ -49,8 +50,10 @@ public class QuickUsePotionPacket extends MyPacket<QuickUsePotionPacket> {
                     .collect(Collectors.groupingBy(x -> x.getRight().getType()))
                     .values()
                     .stream()
+                    //pick the greatest one
                     .map(v -> {
                         if (v.size() > 1) {
+                            //sort the list to find the greatest one
                             List<Pair<ItemStack, SlashPotionItem>> sorted = v.stream()
                                     .sorted(((p1, p2) -> -Float.compare(p1.getRight().getType().getHealPercent(p1.getKey()), p2.getRight().getType().getHealPercent(p2.getKey()))))
                                     .toList();
@@ -60,6 +63,7 @@ public class QuickUsePotionPacket extends MyPacket<QuickUsePotionPacket> {
                         }
 
                     })
+                    //try drink
                     .forEach(x -> x.getRight().handlePotionRestore(player, x.getLeft()));
         }
     }
