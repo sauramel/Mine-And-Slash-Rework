@@ -1,7 +1,6 @@
 package com.robertx22.mine_and_slash.gui.overlays.spell_hotbar;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.robertx22.mine_and_slash.capability.player.helper.MyInventory;
 import com.robertx22.mine_and_slash.config.forge.ClientConfigs;
 import com.robertx22.mine_and_slash.config.forge.overlay.OverlayConfig;
 import com.robertx22.mine_and_slash.config.forge.overlay.OverlayType;
@@ -10,15 +9,13 @@ import com.robertx22.mine_and_slash.mmorpg.registers.client.SpellKeybind;
 import com.robertx22.mine_and_slash.saveclasses.PointData;
 import com.robertx22.mine_and_slash.uncommon.datasaving.Load;
 import com.robertx22.mine_and_slash.uncommon.utilityclasses.ChatUtils;
-import com.robertx22.mine_and_slash.uncommon.utilityclasses.ClientOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.IntStream;
+
 
 public class SpellHotbarOverlay {
 
@@ -52,7 +49,6 @@ public class SpellHotbarOverlay {
             if (Load.player(mc.player) == null) {
                 return;
             }
-            if (checkIfNoAvailableSpell()) return;
 
             RenderSystem.enableBlend(); // enables transparency
 
@@ -78,16 +74,6 @@ public class SpellHotbarOverlay {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-    }
-
-    private boolean checkIfNoAvailableSpell(){
-        return IntStream.range(0, Load.player(ClientOnly.getPlayer()).getSkillGemInventory().getGemsInv().getTotalSlots())
-                .boxed()
-                .map(x -> Load.player(ClientOnly.getPlayer()).getSkillGemInventory().getHotbarGem(x).getSpell())
-                //.peek(x -> System.out.println(x.locNameLangFileGUID()))
-                //if all elements are null, means player doesn't have any spell rn.
-                .allMatch(Objects::isNull);
 
     }
 
