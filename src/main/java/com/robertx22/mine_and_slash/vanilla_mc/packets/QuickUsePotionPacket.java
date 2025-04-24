@@ -43,24 +43,24 @@ public class QuickUsePotionPacket extends MyPacket<QuickUsePotionPacket> {
                 }
             }
             potionItems.stream()
+                    //remove all in-cooldown potions
+                    .filter(x -> player.getCooldowns().isOnCooldown(x.getItem()))
                     .map(x -> Pair.of(x, ((SlashPotionItem) x.getItem())))
                     .collect(Collectors.groupingBy(x -> x.getRight().getType()))
-                    .entrySet()
+                    .values()
                     .stream()
-                    .map((entry) -> {
-                        List<Pair<ItemStack, SlashPotionItem>> v = entry.getValue();
+                    .map(v -> {
                         if (v.size() > 1) {
-                            List<Pair<ItemStack, SlashPotionItem>> sorted = v.stream().sorted(((p1, p2) -> -Float.compare(p1.getRight().getType().getHealPercent(p1.getKey()), p2.getRight().getType().getHealPercent(p2.getKey())))).toList();
-                            v.clear();
-                            v.add(sorted.get(0));
+                            List<Pair<ItemStack, SlashPotionItem>> sorted = v.stream()
+                                    .sorted(((p1, p2) -> -Float.compare(p1.getRight().getType().getHealPercent(p1.getKey()), p2.getRight().getType().getHealPercent(p2.getKey()))))
+                                    .toList();
+                            return sorted.get(0);
+                        } else {
+                            return v.get(0);
                         }
-                        return entry.getValue().get(0);
+
                     })
-                    .forEach(x -> {
-                        if (!player.getCooldowns().isOnCooldown(x.getRight())) {
-                            x.getRight().handlePotionRestore(player, x.getLeft());
-                        }
-                    });
+                    .forEach(x -> x.getRight().handlePotionRestore(player, x.getLeft()));
         }
     }
 
