@@ -1,20 +1,25 @@
 package com.robertx22.mine_and_slash.mmorpg.registers.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.robertx22.mine_and_slash.mmorpg.SlashRef;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import org.lwjgl.glfw.GLFW;
 
 public class KeybindsRegister {
 
-    static String CATEGORY = "key." + SlashRef.MODID;
+    static String CATEGORY = "key." + SlashRef.MODID + ".keybind";
+    static String prefix = SlashRef.MODID + ".key.";
 
-    public static KeyMapping HUB_SCREEN_KEY = new KeyMapping("hub_screen", GLFW.GLFW_KEY_H, CATEGORY);
+    public static KeyMapping HUB_SCREEN_KEY = new KeyMapping(prefix + "hub_screen", GLFW.GLFW_KEY_H, CATEGORY);
 
-    public static KeyMapping UNSUMMON = new KeyMapping("unsummon", GLFW.GLFW_KEY_MINUS, CATEGORY);
+    public static KeyMapping UNSUMMON = new KeyMapping(prefix + "unsummon", GLFW.GLFW_KEY_MINUS, CATEGORY);
 
-    public static KeyMapping HOTBAR_SWAP = new KeyMapping("hotbar_swap", GLFW.GLFW_KEY_F1, CATEGORY);
+    public static KeyMapping HOTBAR_SWAP = new KeyMapping(prefix + "hotbar_swap", GLFW.GLFW_KEY_F1, CATEGORY);
+
+    public static KeyMapping QUICK_DRINK_POTION = new KeyMapping(prefix + "quick_drink_potion", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM,GLFW.GLFW_KEY_P, CATEGORY);
 
     public static SpellKeybind SPELL_HOTBAR_1 = new SpellKeybind(1, GLFW.GLFW_KEY_R, null, true);
     public static SpellKeybind SPELL_HOTBAR_2 = new SpellKeybind(2, GLFW.GLFW_KEY_V, null, true);
@@ -34,7 +39,7 @@ public class KeybindsRegister {
         x.register(HUB_SCREEN_KEY);
         x.register(UNSUMMON);
         x.register(HOTBAR_SWAP);
-
+        x.register(QUICK_DRINK_POTION);
         for (SpellKeybind k : SpellKeybind.ALL) {
             x.register(k.key);
         }

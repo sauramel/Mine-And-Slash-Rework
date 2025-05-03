@@ -1,5 +1,6 @@
 package com.robertx22.mine_and_slash.vanilla_mc.items;
 
+import com.robertx22.library_of_exile.deferred.RegObj;
 import com.robertx22.library_of_exile.utils.SoundUtils;
 import com.robertx22.mine_and_slash.database.data.profession.ICreativeTabTiered;
 import com.robertx22.mine_and_slash.database.data.profession.LeveledItem;
@@ -14,6 +15,7 @@ import com.robertx22.mine_and_slash.gui.texts.textblocks.dropblocks.ProfessionDr
 import com.robertx22.mine_and_slash.gui.texts.textblocks.usableitemblocks.UsageBlock;
 import com.robertx22.mine_and_slash.mmorpg.registers.common.items.RarityItems;
 import com.robertx22.mine_and_slash.saveclasses.unit.ResourceType;
+import com.robertx22.mine_and_slash.saveclasses.unit.ResourcesData;
 import com.robertx22.mine_and_slash.uncommon.datasaving.Load;
 import com.robertx22.mine_and_slash.uncommon.effectdatas.EventBuilder;
 import com.robertx22.mine_and_slash.uncommon.effectdatas.rework.RestoreType;
@@ -51,6 +53,10 @@ public class SlashPotionItem extends AutoItem implements ICreativeTabTiered {
         this.type = type;
     }
 
+    public Type getType() {
+        return type;
+    }
+
     @Override
     public String locNameForLangFile() {
         return StringUTIL.capitalise(rar) + " " + type.name + " Potion";
@@ -69,7 +75,7 @@ public class SlashPotionItem extends AutoItem implements ICreativeTabTiered {
     @Override
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
 
-        int num = (int) this.getHealPercent(pStack);
+        int num = (int) this.type.getHealPercent(pStack);
         pTooltipComponents.clear();
         pTooltipComponents.addAll(new ExileTooltips()
                 .accept(new NameBlock(pStack.getHoverName()))
@@ -86,61 +92,92 @@ public class SlashPotionItem extends AutoItem implements ICreativeTabTiered {
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player p, InteractionHand pUsedHand) {
         ItemStack stack = p.getItemInHand(pUsedHand);
 
-
         if (!pLevel.isClientSide) {
-
-            if (type == Type.HP) {
-                EventBuilder.ofRestore(p, p, ResourceType.health, RestoreType.potion, HealthUtils.getMaxHealth(p) * getHealPercent(stack) / 100F).build().Activate();
-                EventBuilder.ofRestore(p, p, ResourceType.magic_shield, RestoreType.potion, Load.Unit(p).getUnit().magicShieldData().getValue() * getHealPercent(stack) / 100F).build().Activate();
-            } else {
-                EventBuilder.ofRestore(p, p, ResourceType.mana, RestoreType.potion, Load.Unit(p).getUnit().manaData().getValue() * getHealPercent(stack) / 100F).build().Activate();
-                EventBuilder.ofRestore(p, p, ResourceType.energy, RestoreType.potion, Load.Unit(p).getUnit().energyData().getValue() * getHealPercent(stack) / 100F).build().Activate();
-            }
-
-
-            for (SlashPotionItem c : getCooldownItems()) {
-                p.getCooldowns().addCooldown(c, getCooldownTicks());
-            }
-
-            SoundUtils.playSound(p, SoundEvents.GENERIC_DRINK);
-            stack.shrink(1);
+            handlePotionRestore(p, stack);
         }
-
 
         return InteractionResultHolder.pass(p.getItemInHand(pUsedHand));
 
+    }
+
+    public void handlePotionRestore(Player p, ItemStack stack) {
+        if (type.restoreResource(p, stack, this)) {
+            type.getSameTypePotions().forEach(x -> p.getCooldowns().addCooldown(x, getCooldownTicks()));
+            SoundUtils.playSound(p, SoundEvents.GENERIC_DRINK);
+            stack.shrink(1);
+        }
     }
 
     public int getCooldownTicks() {
         return 20 * 30;
     }
 
-    public List<SlashPotionItem> getCooldownItems() {
-
-        if (type == Type.HP) {
-            return RarityItems.HEALTH_POTIONS.values().stream().map(x -> x.get()).collect(Collectors.toList());
-        } else {
-            return RarityItems.RESOURCE_POTIONS.values().stream().map(x -> x.get()).collect(Collectors.toList());
-
-        }
-    }
-
-    public float getHealPercent(ItemStack stack) {
-        var r = getRarity();
-        SkillItemTier tier = LeveledItem.getTier(stack);
-        return 5 + (0.25F * r.stat_percents.max * tier.statMulti); // todo maybe make separate value
-    }
 
     public GearRarity getRarity() {
         return ExileDB.GearRarities().get(rar);
     }
 
     public enum Type {
-        HP("Health", Items.POTATO),
-        MANA("Mana", Items.CARROT);
+        HP("Health", Items.POTATO) {
+            @Override
+            public boolean restoreResource(Player player, ItemStack itemStack, SlashPotionItem slashPotionItem) {
+                float healPercent = this.getHealPercent(itemStack);
+                ResourcesData resources = Load.Unit(player).getResources();
+                if (HealthUtils.getCurrentHealth(player) < HealthUtils.getMaxHealth(player) || resources.getMagicShield() < resources.getMax(player, ResourceType.magic_shield)) {
+                    EventBuilder.ofRestore(player, player, ResourceType.health, RestoreType.potion, HealthUtils.getMaxHealth(player) * healPercent / 100F).build().Activate();
+                    EventBuilder.ofRestore(player, player, ResourceType.magic_shield, RestoreType.potion, Load.Unit(player).getUnit().magicShieldData().getValue() * healPercent / 100F).build().Activate();
+                    return true;
+                }
+                return false;
+
+            }
+
+            @Override
+            public List<SlashPotionItem> getSameTypePotions() {
+                return RarityItems.HEALTH_POTIONS.values().stream().map(RegObj::get).collect(Collectors.toList());
+            }
+
+            @Override
+            public float getHealPercent(ItemStack stack) {
+                var r = ((SlashPotionItem) stack.getItem()).getRarity();
+                SkillItemTier tier = LeveledItem.getTier(stack);
+                return 5 + (0.25F * r.stat_percents.max * tier.statMulti);
+            }
+        },
+        MANA("Mana", Items.CARROT) {
+            @Override
+            public boolean restoreResource(Player player, ItemStack itemStack, SlashPotionItem slashPotionItem) {
+                float healPercent = this.getHealPercent(itemStack);
+                ResourcesData resources = Load.Unit(player).getResources();
+                if (resources.getMana() < resources.getMax(player, ResourceType.mana) || resources.getEnergy() < resources.getMax(player, ResourceType.energy)) {
+                    EventBuilder.ofRestore(player, player, ResourceType.mana, RestoreType.potion, Load.Unit(player).getUnit().manaData().getValue() * healPercent / 100F).build().Activate();
+                    EventBuilder.ofRestore(player, player, ResourceType.energy, RestoreType.potion, Load.Unit(player).getUnit().energyData().getValue() * healPercent / 100F).build().Activate();
+
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public List<SlashPotionItem> getSameTypePotions() {
+                return RarityItems.RESOURCE_POTIONS.values().stream().map(RegObj::get).collect(Collectors.toList());
+            }
+
+            @Override
+            public float getHealPercent(ItemStack stack) {
+                var r = ((SlashPotionItem) stack.getItem()).getRarity();
+                SkillItemTier tier = LeveledItem.getTier(stack);
+                return 5 + (0.25F * r.stat_percents.max * tier.statMulti);
+            }
+        };
         String name;
 
         Item craftItem;
+
+
+        public abstract boolean restoreResource(Player player, ItemStack itemStack, SlashPotionItem slashPotionItem);
+        public abstract List<SlashPotionItem> getSameTypePotions();
+        public abstract float getHealPercent(ItemStack stack);
 
         Type(String name, Item craftItem) {
             this.name = name;

@@ -6,6 +6,7 @@ import com.robertx22.mine_and_slash.gui.screens.character_screen.MainHubScreen;
 import com.robertx22.mine_and_slash.mmorpg.registers.client.KeybindsRegister;
 import com.robertx22.mine_and_slash.mmorpg.registers.client.SpellKeybind;
 import com.robertx22.mine_and_slash.uncommon.utilityclasses.ChatUtils;
+import com.robertx22.mine_and_slash.vanilla_mc.packets.QuickUsePotionPacket;
 import com.robertx22.mine_and_slash.vanilla_mc.packets.UnsummonPacket;
 import com.robertx22.mine_and_slash.vanilla_mc.packets.spells.TellServerToCastSpellPacket;
 import net.minecraft.client.Minecraft;
@@ -41,6 +42,8 @@ public class OnKeyPress {
         } else if (KeybindsRegister.HOTBAR_SWAP.isDown()) {
             SpellKeybind.IS_ON_SECONd_HOTBAR = !SpellKeybind.IS_ON_SECONd_HOTBAR;
             cooldown = 5;
+        } else if (KeybindsRegister.QUICK_DRINK_POTION.consumeClick()) {
+            Packets.sendToServer(new QuickUsePotionPacket());
         } else {
 
             int number = -1;
