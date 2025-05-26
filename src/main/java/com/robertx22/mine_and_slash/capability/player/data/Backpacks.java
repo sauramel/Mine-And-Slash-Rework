@@ -96,26 +96,32 @@ public class Backpacks {
     }
 
 
-    public void tryAutoPickup(Player p, ItemStack stack) {
+    public boolean tryAutoPickup(Player p, ItemStack stack, boolean shouldPlaySound) {
 
         if (p.getInventory().countItem(SlashItems.MASTER_BAG.get()) < 1) {
-            return;
+            return false;
         }
-
+        boolean result = false;
         for (BackpackType type : BackpackType.values()) {
             if (type.isValid(stack)) {
                 var bag = getInv(type);
 
-                if (bag.hasFreeSlots()) {
+                if (bag.canAddItem(stack)) {
                     bag.addItem(stack.copy());
                     stack.shrink(stack.getCount() + 10); // just in case
-                    SoundUtils.playSound(this.player, SoundEvents.ITEM_PICKUP);
-                    return;
+                    if (shouldPlaySound) SoundUtils.playSound(this.player, SoundEvents.ITEM_PICKUP);
+                    result = true;
+                    break;
                 }
             }
         }
 
+        return result;
 
+    }
+
+    public boolean tryAutoPickup(Player p, ItemStack stack){
+        return tryAutoPickup(p, stack, true);
     }
     // todo every time before you open backpack, it will replace locked slots with blocked slots that cant be clicked on and throw out/give items back
 

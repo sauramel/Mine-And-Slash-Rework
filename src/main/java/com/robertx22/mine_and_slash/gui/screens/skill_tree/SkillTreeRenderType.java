@@ -17,10 +17,6 @@ public class SkillTreeRenderType extends RenderStateShard {
         super(pName, pSetupState, pClearState);
     }
 
-    public static RenderType CONNECTION = getSkillTreeRenderType("connection", SlashRef.id("textures/gui/skill_tree/skill_connection.png"));
-
-    private static final TransparencyStateShard blend = new TransparencyStateShard("boring_blend", RenderSystem::enableBlend, RenderSystem::disableBlend);
-
 
 
     public static RenderType getSkillTreeRenderType(String name, ResourceLocation texture) {

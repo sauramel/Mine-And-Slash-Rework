@@ -18,6 +18,7 @@ import com.robertx22.mine_and_slash.gui.screens.skill_tree.buttons.PerkButton;
 import com.robertx22.mine_and_slash.gui.screens.skill_tree.buttons.PerkConnectionRender;
 import com.robertx22.mine_and_slash.gui.screens.skill_tree.buttons.PerkPointPair;
 import com.robertx22.mine_and_slash.gui.screens.skill_tree.buttons.PerkScreenContext;
+import com.robertx22.mine_and_slash.gui.screens.skill_tree.component.TipsWidget;
 import com.robertx22.mine_and_slash.mmorpg.MMORPG;
 import com.robertx22.mine_and_slash.mmorpg.SlashRef;
 import com.robertx22.mine_and_slash.saveclasses.PointData;
@@ -49,6 +50,7 @@ public abstract class SkillTreeScreen extends BaseScreen implements INamedScreen
 
     static ResourceLocation CON = SlashRef.id("textures/gui/skill_tree/skill_connection.png");
     public VertexContainer vertexContainer = new VertexContainer();
+    private TipsWidget tips;
 
 
     private void renderConnection(GuiGraphics graphics, PerkConnectionRender renderer) {
@@ -237,7 +239,8 @@ public abstract class SkillTreeScreen extends BaseScreen implements INamedScreen
             this.school = ExileDB.TalentTrees().getFilterWrapped(x -> x.getSchool_type().equals(this.schoolType)).list.get(0);
 
             refreshButtons();
-
+            this.tips = new TipsWidget(0, 0, 10, 10, Gui.TALENT_SCREEN_SEARCH_TIPS.locName(Gui.TALENT_SCREEN_SEARCH_KEYWORD_ALL.locName().withStyle(ChatFormatting.GOLD), Gui.TALENT_SCREEN_SEARCH_KEYWORD_GAME_CHANGER.locName().withStyle(ChatFormatting.GOLD)));
+            addWidget(tips);
 
             goToCenter();
         } catch (Exception e) {
@@ -439,6 +442,7 @@ public abstract class SkillTreeScreen extends BaseScreen implements INamedScreen
         renderBackgroundDirt(gui, this, 0);
         zoom = Mth.lerp(ClientConfigs.getConfig().SKILL_TREE_ZOOM_SPEED.get().floatValue(), zoom, targetZoom);
         renderPanels(gui);
+        tips.render(gui, x, y, ticks);
         gui.pose().scale(zoom, zoom, zoom);
 
         try {
@@ -547,6 +551,9 @@ public abstract class SkillTreeScreen extends BaseScreen implements INamedScreen
         SkillTreeScreen.SEARCH.setX(tx);
         SkillTreeScreen.SEARCH.setY(yx);
         SkillTreeScreen.SEARCH.render(gui, 0, 0, 0);
+
+        tips.setX(tx + SkillTreeScreen.SEARCH.getWidth() - tips.getWidth() - 2);
+        tips.setY(yx + (SkillTreeScreen.SEARCH.getHeight() - tips.getHeight()) / 2);
 
 
         if (MMORPG.RUN_DEV_TOOLS) {

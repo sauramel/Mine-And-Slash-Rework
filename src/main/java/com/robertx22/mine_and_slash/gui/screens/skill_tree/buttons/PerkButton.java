@@ -16,6 +16,7 @@ import com.robertx22.mine_and_slash.saveclasses.PointData;
 import com.robertx22.mine_and_slash.saveclasses.gearitem.gear_bases.ModRange;
 import com.robertx22.mine_and_slash.saveclasses.gearitem.gear_bases.StatRangeInfo;
 import com.robertx22.mine_and_slash.uncommon.MathHelper;
+import com.robertx22.mine_and_slash.uncommon.localization.Gui;
 import com.robertx22.mine_and_slash.vanilla_mc.packets.perks.PerkChangePacket;
 import com.robertx22.library_of_exile.main.Packets;
 import com.robertx22.library_of_exile.utils.GuiUtils;
@@ -188,21 +189,24 @@ public class PerkButton extends ImageButton {
         var search = SkillTreeScreen.SEARCH.getValue();
 
 
-        float opacity;
+        float opacity = 0.2f;
 
         if (!search.isEmpty()) {
-            if (search.equals("all")) {
-                if (status != PerkStatus.CONNECTED) {
-                    opacity = 0.2F;
-                } else {
+            if (search.equals(Gui.TALENT_SCREEN_SEARCH_KEYWORD_ALL.locName().getString())) {
+                if (status == PerkStatus.CONNECTED) {
                     opacity = 1;
                 }
-            } else {
-                boolean containsSearchStat = perk.stats.stream()
+            } else if (perk.stats.stream()
+                    .anyMatch(item -> item.getStat().locName().getString().toLowerCase().contains(search.toLowerCase())) || perk.locName().getString().toLowerCase().contains(search.toLowerCase())){
+                /*boolean containsSearchStat = perk.stats.stream()
                         .anyMatch(item -> item.getStat().locName().getString().toLowerCase().contains(search.toLowerCase()));
 
-                boolean containsName = perk.locName().getString().toLowerCase().contains(search.toLowerCase());
-                opacity = containsSearchStat || containsName ? 1F : 0.2f;
+                boolean containsName = perk.locName().getString().toLowerCase().contains(search.toLowerCase());*/
+                opacity = 1F;
+            } else if (search.equals(Gui.TALENT_SCREEN_SEARCH_KEYWORD_GAME_CHANGER.locName().getString())) {
+                if (perk.getType().equals(Perk.PerkType.MAJOR)){
+                    opacity = 1F;
+                }
             }
         } else {
             opacity = status.getOpacity();
