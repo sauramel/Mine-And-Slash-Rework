@@ -2,11 +2,13 @@ package com.robertx22.mine_and_slash.vanilla_mc.packets;
 
 import com.robertx22.library_of_exile.main.MyPacket;
 import com.robertx22.library_of_exile.packets.ExilePacketContext;
+import com.robertx22.library_of_exile.utils.SoundUtils;
 import com.robertx22.mine_and_slash.mmorpg.SlashRef;
 import com.robertx22.mine_and_slash.vanilla_mc.items.SlashPotionItem;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -45,7 +47,7 @@ public class QuickUsePotionPacket extends MyPacket<QuickUsePotionPacket> {
             }
             potionItems.stream()
                     //remove all in-cooldown potions
-                    .filter(x -> player.getCooldowns().isOnCooldown(x.getItem()))
+                    .filter(x -> !player.getCooldowns().isOnCooldown(x.getItem()))
                     .map(x -> Pair.of(x, ((SlashPotionItem) x.getItem())))
                     .collect(Collectors.groupingBy(x -> x.getRight().getType()))
                     .values()
@@ -64,7 +66,11 @@ public class QuickUsePotionPacket extends MyPacket<QuickUsePotionPacket> {
 
                     })
                     //try drink
-                    .forEach(x -> x.getRight().handlePotionRestore(player, x.getLeft()));
+                    .map(x -> x.getRight().handlePotionRestore(player, x.getLeft()))
+                    .filter(x -> x)
+                    //at least one potion is consumed
+                    .findFirst()
+                    .ifPresentOrElse(x -> SoundUtils.playSound(player, SoundEvents.VILLAGER_YES), () -> SoundUtils.playSound(player, SoundEvents.VILLAGER_NO));
         }
     }
 
