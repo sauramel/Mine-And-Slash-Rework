@@ -20,6 +20,7 @@ public class ItemModificationSers {
     public static String UPGRADE_MAP_RARITY = "upgrade_map_rarity";
     public static String JEWEL_CORRUPT = "corrupt_jewel";
     public static String REROLL_AFFIX_NUMBERS = "reroll_affix_numbers";
+    public static String REROLL_IMPLICIT_NUMBERS = "reroll_implicit_numbers";
     public static String EXTRACT_SOCKET = "extract_socket";
     public static String FORCE_SOUL_TAG = "force_soul_tag";
 
