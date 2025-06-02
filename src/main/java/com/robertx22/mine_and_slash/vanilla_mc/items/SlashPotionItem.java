@@ -100,12 +100,14 @@ public class SlashPotionItem extends AutoItem implements ICreativeTabTiered {
 
     }
 
-    public void handlePotionRestore(Player p, ItemStack stack) {
-        if (type.restoreResource(p, stack, this)) {
+    public boolean handlePotionRestore(Player p, ItemStack stack) {
+        boolean b = type.restoreResource(p, stack, this);
+        if (b) {
             type.getSameTypePotions().forEach(x -> p.getCooldowns().addCooldown(x, getCooldownTicks()));
             SoundUtils.playSound(p, SoundEvents.GENERIC_DRINK);
             stack.shrink(1);
         }
+        return b;
     }
 
     public int getCooldownTicks() {
