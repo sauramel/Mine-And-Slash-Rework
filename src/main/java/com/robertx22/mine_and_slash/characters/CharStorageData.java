@@ -49,6 +49,11 @@ public class CharStorageData {
 
     public int tryAddNewCharacter(Player p, String name) {
 
+        if (!canChangeCharactersRightNow(p))
+        {
+            return -1;
+        }
+
         if (!nameIsValid(p, name)) {
             p.sendSystemMessage(Chats.CREATE_ERROR_NAME.locName().withStyle(ChatFormatting.RED));
             return -1;
