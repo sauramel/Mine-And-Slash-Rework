@@ -1,6 +1,7 @@
 package com.robertx22.mine_and_slash.saveclasses.gearitem.gear_parts;
 
 import com.robertx22.library_of_exile.wrappers.ExileText;
+import com.robertx22.mine_and_slash.database.data.MinMax;
 import com.robertx22.mine_and_slash.database.data.affixes.Affix;
 import com.robertx22.mine_and_slash.database.data.requirements.bases.GearRequestedFor;
 import com.robertx22.mine_and_slash.database.registry.ExileDB;
@@ -42,7 +43,7 @@ public class ImplicitStatsData implements IGearPartTooltip, IRerollable, IStatsC
 
     @Override
     public void RerollNumbers(GearItemData gear) {
-        RerollFully(gear);
+        p = getMinMax(gear).random();;
     }
 
     @Override

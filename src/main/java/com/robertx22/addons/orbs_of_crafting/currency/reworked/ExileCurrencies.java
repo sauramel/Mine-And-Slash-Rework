@@ -195,6 +195,15 @@ public class ExileCurrencies extends ExileKeyHolder<ExileCurrency> {
             .weight(CodeCurrency.Weights.COMMON)
             .build(this);
 
+    public ExileKey<ExileCurrency, IdKey> REROLL_IMPLICIT_NUMBERS = ExileCurrency.Builder.of("implicit_number_reroll", "Orb of Genesis", ItemReqs.INSTANCE.IS_GEAR)
+            .rarity(IRarity.LEGENDARY_ID)
+            .addRequirement(ItemReqs.INSTANCE.IS_NOT_CORRUPTED)
+            .addRequirement(ItemReqs.INSTANCE.HAS_IMPLICIT)
+            .addAlwaysUseModification(ItemMods.INSTANCE.REROLL_IMPLICIT_NUMBERS)
+            .potentialCost(10)
+            .weight(CodeCurrency.Weights.RARE)
+            .build(this);
+
     public ExileKey<ExileCurrency, IdKey> UPGRADE_CORRUPTION_AFFIX = ExileCurrency.Builder.of("up_corrupt_affix", "Orb of Foolish Risk",
                     ItemReqs.INSTANCE.IS_GEAR, ItemReqs.INSTANCE.IS_JEWEL)
             .rarity(IRarity.EPIC_ID)

@@ -70,6 +70,7 @@ public class ItemReqs extends ExileKeyHolder<ItemRequirement> {
 
     public ExileKey<ItemRequirement, KeyInfo> LEVEL_NOT_MAX = ExileKey.ofId(this, "lvl_not_max", x -> new LevelNotMaxReq(x.GUID()));
     public ExileKey<ItemRequirement, KeyInfo> HAS_AFFIXES = ExileKey.ofId(this, "has_affixes", x -> new MustHaveAffixesReq(x.GUID()));
+    public ExileKey<ItemRequirement, KeyInfo> HAS_IMPLICIT = ExileKey.ofId(this, "has_implicit", x -> new MustHaveImplicitReq(x.GUID()));
     public ExileKey<ItemRequirement, KeyInfo> HAS_CORRUPTION_AFFIXES = ExileKey.ofId(this, "has_corrupt_affixes", x -> new HasCorruptAffixes(x.GUID()));
     public ExileKey<ItemRequirement, KeyInfo> IS_NOT_CORRUPTED = ExileKey.ofId(this, "is_not_corrupted", x -> new IsNotCorruptedReq(x.GUID()));
     public ExileKey<ItemRequirement, KeyInfo> HAS_INFUSION = ExileKey.ofId(this, "has_infusion", x -> new HasInfusionReq(x.GUID()));
