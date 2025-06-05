@@ -38,7 +38,7 @@ public class GiveProfessionExp {
             PlayerData data = Load.player(player);
             data.professions.addExp(player, professionId, exp);
 
-            player.sendSystemMessage(Component.literal("Gained " + exp + " " + professionId + " Experience")); // Success message
+            //player.sendSystemMessage(Component.literal("Gained " + exp + " " + professionId + " Experience")); // Success message
 
         } catch (Exception e) {
             e.printStackTrace();
