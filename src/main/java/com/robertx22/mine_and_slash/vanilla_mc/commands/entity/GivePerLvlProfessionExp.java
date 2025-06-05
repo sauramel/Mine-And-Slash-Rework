@@ -24,27 +24,31 @@ public class GivePerLvlProfessionExp {
                                 .then(literal("prof_xp_times_lvl")
                                         .requires(e -> e.hasPermission(2))
                                         .then(argument("target", EntityArgument.player())
-                                                .then(argument("professionId", StringArgumentType.string()) // Changed argument type to string and name to professionId
+                                                .then(argument("professionId", StringArgumentType.string())
                                                         .then(argument("exp", IntegerArgumentType.integer())
                                                                 .executes(ctx -> run(EntityArgument.getPlayer(ctx, "target"),
-                                                                        StringArgumentType.getString(ctx, "professionId"), // Get the professionId string
-                                                                        IntegerArgumentType.getInteger(ctx, "exp"))))))))); // Pass all arguments to run
+                                                                        StringArgumentType.getString(ctx, "professionId"),
+                                                                        IntegerArgumentType.getInteger(ctx, "exp")))))))));
     }
 
-    private static int run(Player player, String professionId, int exp) { // Added professionId parameter
+    private static int run(Player player, String professionId, int exp) {
 
         try {
             PlayerData data = Load.player(player);
-            int total = exp * Load.Unit(player).getLevel();
-            data.professions.addExp(player, professionId, total);
 
-            player.sendSystemMessage(Component.literal("Gained " + total + " " + professionId + " Experience")); // Success message
+            // Get the profession level for the given profession
+            int professionLevel = data.professions.getLevel(professionId);
+
+            int total = exp * professionLevel;
+
+            data.professions.addExp(player, professionId, total);
+            // player.sendSystemMessage(Component.literal("Gained " + total + " " + professionId + " Experience (based on level " + professionLevel + ")"));
 
         } catch (Exception e) {
             e.printStackTrace();
-            player.sendSystemMessage(Component.literal("Failed to give experience: " + e.getMessage())); // Error message
+            player.sendSystemMessage(Component.literal("Failed to give experience: " + e.getMessage()));
         }
 
-        return 1; // Return 1 to indicate success
+        return 1;
     }
 }
