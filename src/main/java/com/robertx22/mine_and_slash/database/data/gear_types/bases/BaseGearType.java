@@ -165,6 +165,10 @@ public final class BaseGearType implements IAutoLocName, JsonExileRegistry<BaseG
         return family() == SlotFamily.Weapon;
     }
 
+    public final boolean isOffhand() {
+        return family() == SlotFamily.OffHand;
+    }
+
     public final boolean isMeleeWeapon() {
         return this.getTags()
                 .contains(SlotTags.melee_weapon);

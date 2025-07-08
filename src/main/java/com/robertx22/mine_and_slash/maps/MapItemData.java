@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.robertx22.library_of_exile.utils.ItemstackDataSaver;
 import com.robertx22.dungeon_realm.item.DungeonItemMapData;
 import com.robertx22.dungeon_realm.item.DungeonItemNbt;
+import com.robertx22.library_of_exile.utils.RandomUtils;
 import com.robertx22.mine_and_slash.aoe_data.database.stats.OffenseStats;
 import com.robertx22.mine_and_slash.config.forge.ServerContainer;
 import com.robertx22.mine_and_slash.database.data.game_balance_config.GameBalanceConfig;
@@ -17,6 +18,7 @@ import com.robertx22.mine_and_slash.gui.texts.IgnoreNullList;
 import com.robertx22.mine_and_slash.gui.texts.textblocks.*;
 import com.robertx22.mine_and_slash.itemstack.ExileStack;
 import com.robertx22.mine_and_slash.loot.blueprints.MapBlueprint;
+import com.robertx22.mine_and_slash.mmorpg.registers.common.items.RarityItems;
 import com.robertx22.mine_and_slash.saveclasses.ExactStatData;
 import com.robertx22.mine_and_slash.saveclasses.gearitem.gear_bases.ModRange;
 import com.robertx22.mine_and_slash.saveclasses.gearitem.gear_bases.StatRangeInfo;
@@ -281,7 +283,7 @@ public class MapItemData implements ICommonDataItem<GearRarity> {
 
     @Override
     public String getRarityId() {
-        return null;
+        return rar;
     }
 
     public GearRarity getRarity() {
@@ -311,11 +313,15 @@ public class MapItemData implements ICommonDataItem<GearRarity> {
 
     @Override
     public List<ItemStack> getSalvageResult(ExileStack stack) {
-        return Arrays.asList();
+        if (!isSalvagable(stack)) {
+            return Arrays.asList();
+        }
+        int amount = 1;
+        return Arrays.asList(new ItemStack(RarityItems.RARITY_STONE.getOrDefault(getRarity().GUID(), RarityItems.RARITY_STONE.get(IRarity.COMMON_ID)).get(), amount));
     }
 
     @Override
     public ToggleAutoSalvageRarity.SalvageType getSalvageType() {
-        return null; // todo
+        return ToggleAutoSalvageRarity.SalvageType.MAP;
     }
 }

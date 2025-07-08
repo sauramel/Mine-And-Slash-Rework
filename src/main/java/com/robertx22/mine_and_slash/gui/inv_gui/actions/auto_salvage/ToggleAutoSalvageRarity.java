@@ -80,9 +80,15 @@ public class ToggleAutoSalvageRarity extends GuiAction {
     }
 
     public enum SalvageType {
-        GEAR(Words.Gear),
+        // limited to y=6 so collapsed offhand and jewelry into other gear
+        WEAPON(Words.WeaponGear),
+        ARMOR(Words.ArmorGear),
+        //OFFHAND(Words.OffhandGear),
+        //JEWELRY(Words.JewelryGear),
+        GEAR(Words.OtherGear),
         JEWEL(Words.Jewel),
-        SPELL(Words.SkillGem);
+        SPELL(Words.SkillGem),
+        MAP(Words.Map);
 
 
         public Words word;
