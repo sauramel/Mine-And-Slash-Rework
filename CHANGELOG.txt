@@ -1,8 +1,5 @@
 Changelog of recent updates: https://github.com/RobertSkalko/Mine-And-Slash-Rework/blob/1.20-Forge/changelogs/v.6.2.txt
 
-v.6.2.5
+v.6.3.1
 
-- attempt to fix entity configs overriding levels for harvest and obelisk maps
-- added localizations
-- server crash fix
-- some
+- Merged PRs
