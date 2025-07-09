@@ -83,7 +83,15 @@ public class GearItemData implements ICommonDataItem<GearRarity> {
 
     @Override
     public ToggleAutoSalvageRarity.SalvageType getSalvageType() {
-        return ToggleAutoSalvageRarity.SalvageType.GEAR;
+        if (GetBaseGearType().isWeapon()) {
+            return ToggleAutoSalvageRarity.SalvageType.WEAPON;
+        }
+        else if (GetBaseGearType().isArmor()) {
+            return ToggleAutoSalvageRarity.SalvageType.ARMOR;
+        }
+        else {
+            return ToggleAutoSalvageRarity.SalvageType.GEAR;
+        }
     }
 
     @Override

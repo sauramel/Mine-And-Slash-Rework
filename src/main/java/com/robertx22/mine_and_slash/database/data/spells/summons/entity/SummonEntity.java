@@ -49,7 +49,12 @@ public abstract class SummonEntity extends TamableAnimal implements RangedAttack
                 if (owner instanceof Player p) {
                     if (Load.player(p).config.isConfigEnabled(PlayerConfigData.Config.AGGRESSIVE_SUMMONS)) {
                         if (aggroGoal == null) {
-                            aggroGoal = new NearestAttackableTargetGoal<>(this, Monster.class, false);
+                            if (!usesRanged()) {
+                                aggroGoal = new NearestAttackableTargetGoal<>(this, Monster.class, false, true);
+                            } else {
+
+                                aggroGoal = new NearestAttackableTargetGoal<>(this, Monster.class, false);
+                            }
                             this.targetSelector.addGoal(2, aggroGoal);
                         }
                     }
@@ -130,8 +135,13 @@ public abstract class SummonEntity extends TamableAnimal implements RangedAttack
 
         this.targetSelector.addGoal(3, new OwnerHurtByTargetGoal(this));
         this.targetSelector.addGoal(4, new OwnerHurtTargetGoal(this));
-        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false, x -> canAttack(x)));
 
+        if (usesMelee()) {
+            this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, true, x -> canAttack(x)));
+        }
+        if (usesRanged()) {
+            this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, false, x -> canAttack(x)));
+        }
     }
 
     public Entity focusEntity = null;
