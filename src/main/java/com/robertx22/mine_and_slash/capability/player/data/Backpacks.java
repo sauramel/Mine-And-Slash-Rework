@@ -8,6 +8,7 @@ import com.robertx22.mine_and_slash.mmorpg.SlashRef;
 import com.robertx22.mine_and_slash.mmorpg.registers.common.items.SlashItems;
 import com.robertx22.mine_and_slash.uncommon.datasaving.StackSaving;
 import com.robertx22.mine_and_slash.uncommon.localization.Words;
+import com.robertx22.mine_and_slash.uncommon.utilityclasses.DataSaverCheckUtil;
 import com.robertx22.mine_and_slash.vanilla_mc.items.gemrunes.RuneItem;
 import com.robertx22.mine_and_slash.vanilla_mc.items.misc.RarityStoneItem;
 import com.robertx22.orbs_of_crafting.register.ExileCurrency;
@@ -42,7 +43,7 @@ public class Backpacks {
         MAPS("map", Words.Maps) {
             @Override
             public boolean isValid(ItemStack stack) {
-                return StackSaving.MAP.has(stack);
+                return StackSaving.MAP.has(stack) || DataSaverCheckUtil.checkForDataSaver("ancient_obelisks" + "_obelisk", stack) || DataSaverCheckUtil.checkForDataSaver("the_harvest" + "_map", stack);
             }
         },
         CURRENCY("currency", Words.Currency) {
