@@ -5,16 +5,14 @@ import com.robertx22.mine_and_slash.capability.player.data.PlayerConfigData;
 import com.robertx22.mine_and_slash.database.data.gear_slots.GearSlot;
 import com.robertx22.mine_and_slash.database.registry.ExileDB;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 // todo wrap these configs into a class and separate them into categories: loot configs, lvl penalty configs, map configs etc
 public class ServerContainer {
@@ -151,6 +149,13 @@ public class ServerContainer {
                     return true;
                 });
 
+        ENTITY_SUMMON_BLACKLIST = b.comment("Entities that summons should not attack")
+                .define("ENTITY_SUMMON_BLACKLIST", Arrays.asList(
+                        "minecraft:allay",
+                        "minecraft:armor_stand"
+                        // Add default blacklisted entities here
+                ));
+
         b.comment("These are just default values for the Mine and slash Hub > features").push("Default Feature Configs");
 
         for (PlayerConfigData.Config value : PlayerConfigData.Config.values()) {
@@ -202,8 +207,14 @@ public class ServerContainer {
         return SOUL_CLEANER_ITEM_BLACKLIST.get().stream().anyMatch(x -> x.equals(id));
     }
 
+    public boolean isEntitySummonBlacklisted(LivingEntity entity) {
+        String id = Objects.requireNonNull(ForgeRegistries.ENTITY_TYPES.getKey(entity.getType())).toString();
+        return ENTITY_SUMMON_BLACKLIST.get().stream().anyMatch(x -> x.equals(id));
+    }
+
     public ForgeConfigSpec.ConfigValue<List<? extends String>> GEAR_COMPATS;
     public ForgeConfigSpec.ConfigValue<List<? extends String>> SOUL_CLEANER_ITEM_BLACKLIST;
+    public ForgeConfigSpec.ConfigValue<List<? extends String>> ENTITY_SUMMON_BLACKLIST;
 
     //public ForgeConfigSpec.BooleanValue DO_NOT_DESPAWN_MAP_MOBS;
     public ForgeConfigSpec.BooleanValue GET_STARTER_ITEMS;

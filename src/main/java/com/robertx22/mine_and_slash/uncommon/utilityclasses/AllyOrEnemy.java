@@ -1,5 +1,6 @@
 package com.robertx22.mine_and_slash.uncommon.utilityclasses;
 
+import com.robertx22.mine_and_slash.config.forge.ServerContainer;
 import com.robertx22.mine_and_slash.database.data.spells.summons.entity.SummonEntity;
 import com.robertx22.mine_and_slash.uncommon.datasaving.Load;
 import net.minecraft.world.entity.Entity;
@@ -41,8 +42,10 @@ public enum AllyOrEnemy {
             if (type == EntityTypeUtils.EntityClassification.NPC) {
                 return false;
             }
-
             if (target instanceof NeutralMob) {
+                return false;
+            }
+            if (ServerContainer.get().isEntitySummonBlacklisted(target)) {
                 return false;
             }
 
