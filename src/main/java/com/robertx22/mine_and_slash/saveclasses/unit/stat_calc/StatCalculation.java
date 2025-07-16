@@ -4,6 +4,7 @@ import com.robertx22.mine_and_slash.capability.entity.EntityData;
 import com.robertx22.mine_and_slash.capability.player.PlayerData;
 import com.robertx22.mine_and_slash.capability.player.helper.GemInventoryHelper;
 import com.robertx22.mine_and_slash.database.data.spells.components.Spell;
+import com.robertx22.mine_and_slash.database.data.stats.datapacks.stats.AddPerPercentOfOther;
 import com.robertx22.mine_and_slash.database.data.stats.datapacks.stats.AttributeStat;
 import com.robertx22.mine_and_slash.database.data.stats.types.core_stats.base.ICoreStat;
 import com.robertx22.mine_and_slash.gui.screens.stat_gui.StatCalcInfoData;
@@ -106,10 +107,35 @@ public class StatCalculation {
         copiedStats = unit.getStats().clone();
 
 
-        for (Map.Entry<String, StatData> en : stats.entrySet()) {
-            if (en.getValue().GetStat() instanceof AddToAfterCalcEnd aff) {
-                aff.affectStats(copiedStats, unit.getStats(), en.getValue());
+        var addToAfterCalcStats = stats.entrySet().stream()
+                .filter(en -> en.getValue().GetStat() instanceof AddToAfterCalcEnd)
+                .sorted((a, b) -> {
+                    var statA = a.getValue().GetStat();
+                    var statB = b.getValue().GetStat();
+
+                    int priorityA = (statA instanceof AddPerPercentOfOther addA) ? addA.priority : Integer.MAX_VALUE;
+                    int priorityB = (statB instanceof AddPerPercentOfOther addB) ? addB.priority : Integer.MAX_VALUE;
+
+                    return Integer.compare(priorityA, priorityB);
+                })
+                .toList();
+
+        int lastPriority = Integer.MIN_VALUE;
+
+        for (var en : addToAfterCalcStats) {
+            AddToAfterCalcEnd aff = (AddToAfterCalcEnd) en.getValue().GetStat();
+
+            // Get current priority
+            int currentPriority = (aff instanceof AddPerPercentOfOther addStat) ?
+                    addStat.priority : Integer.MAX_VALUE;
+
+            // Only clone if priority has increased (new priority tier)
+            if (currentPriority > lastPriority && lastPriority != Integer.MIN_VALUE) {
+                copiedStats = unit.getStats().clone();
             }
+
+            aff.affectStats(copiedStats, unit.getStats(), en.getValue());
+            lastPriority = currentPriority;
         }
 
         for (StatData stat : unit.getStats().stats.values()) {

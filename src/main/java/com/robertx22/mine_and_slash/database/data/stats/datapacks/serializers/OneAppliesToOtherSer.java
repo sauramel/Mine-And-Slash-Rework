@@ -12,6 +12,7 @@ public class OneAppliesToOtherSer implements IStatSerializer<AddPerPercentOfOthe
         this.saveBaseStatValues(obj, json);
         json.addProperty("adder_stat", obj.adder_stat);
         json.addProperty("add_to", obj.stat_to_add_to);
+        json.addProperty("priority", obj.priority);
         json.addProperty("id", obj.GUID());
         return json;
     }
@@ -19,10 +20,11 @@ public class OneAppliesToOtherSer implements IStatSerializer<AddPerPercentOfOthe
     @Override
     public AddPerPercentOfOther getStatFromJson(JsonObject json) {
         String adder = json.get("adder_stat")
-            .getAsString();
+                .getAsString();
         String addto = json.get("add_to")
-            .getAsString();
-        AddPerPercentOfOther stat = new AddPerPercentOfOther(adder, addto);
+                .getAsString();
+        int priority = json.has("priority") ? json.get("priority").getAsInt() : 0;
+        AddPerPercentOfOther stat = new AddPerPercentOfOther(adder, addto, priority);
         this.loadBaseStatValues(stat, json);
         return stat;
     }
