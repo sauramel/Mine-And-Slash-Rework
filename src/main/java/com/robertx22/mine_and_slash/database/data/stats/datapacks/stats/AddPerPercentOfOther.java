@@ -16,14 +16,21 @@ public class AddPerPercentOfOther extends BaseDatapackStat implements AddToAfter
 
     public String adder_stat;
     public String stat_to_add_to;
+    public int priority = 0; // Lower values apply first
 
     transient String locname;
 
+
     public AddPerPercentOfOther(Stat adder_stat, Stat stat_to_add_to) {
+        this(adder_stat, stat_to_add_to, 50);
+    }
+
+    public AddPerPercentOfOther(Stat adder_stat, Stat stat_to_add_to, int priority) {
         super(SER_ID);
         this.id = stat_to_add_to.GUID() + "_per_perc_of_" + adder_stat.GUID();
         this.adder_stat = adder_stat.GUID();
         this.stat_to_add_to = stat_to_add_to.GUID();
+        this.priority = priority;
 
         this.is_perc = true;
         this.min = 0;
@@ -41,9 +48,14 @@ public class AddPerPercentOfOther extends BaseDatapackStat implements AddToAfter
     }
 
     public AddPerPercentOfOther(String adder_stat, String stat_to_add_to) {
+        this(adder_stat, stat_to_add_to, 0);
+    }
+
+    public AddPerPercentOfOther(String adder_stat, String stat_to_add_to, int priority) {
         super(SER_ID);
         this.stat_to_add_to = stat_to_add_to;
         this.adder_stat = adder_stat;
+        this.priority = priority;
 
         this.is_long = true;
         this.is_perc = true;
