@@ -20,6 +20,15 @@ public class ExileEffectInstanceData {
     public float str_multi = 1;
     public int ticks_left = 0;
 
+    public boolean stillOwnsSpell(LivingEntity en) {
+        if (caster_uuid.equals(en.getStringUUID())) {
+            Spell spell = getSpell();
+            if (spell != null && spell.getLevelOf(en) == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public boolean shouldRemove() {
         return ticks_left < 1 || stacks < 1;
