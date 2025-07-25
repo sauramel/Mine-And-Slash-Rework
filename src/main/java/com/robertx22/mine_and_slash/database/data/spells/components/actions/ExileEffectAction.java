@@ -36,8 +36,10 @@ public class ExileEffectAction extends SpellAction {
         }
     }
 
+    public static Double INFINITE_DURATION = -1D;
+
     public ExileEffectAction() {
-        super(Arrays.asList(EXILE_POTION_ID, COUNT, POTION_ACTION)); // optional POTION_DURATION
+        super(Arrays.asList(EXILE_POTION_ID, COUNT, POTION_ACTION, POTION_DURATION));
     }
 
     @Override
@@ -48,9 +50,9 @@ public class ExileEffectAction extends SpellAction {
             GiveOrTake action = data.getPotionAction();
             int count = data.get(COUNT)
                     .intValue();
-            int duration = data.getOrDefault(POTION_DURATION, 0.0)
+            int duration = data.get(POTION_DURATION)
                     .intValue();
-            boolean infinite = !data.has(POTION_DURATION);
+            boolean infinite = data.get(POTION_DURATION).equals(INFINITE_DURATION);
 
             float chance = data.getOrDefault(CHANCE, 100D).floatValue();
 
@@ -91,15 +93,6 @@ public class ExileEffectAction extends SpellAction {
         dmg.type = GUID();
         dmg.put(COUNT, 1D);
         dmg.put(POTION_DURATION, duration);
-        dmg.put(POTION_ACTION, action.name());
-        dmg.put(EXILE_POTION_ID, id);
-        return dmg;
-    }
-
-    public MapHolder create(String id, GiveOrTake action) {
-        MapHolder dmg = new MapHolder();
-        dmg.type = GUID();
-        dmg.put(COUNT, 1D);
         dmg.put(POTION_ACTION, action.name());
         dmg.put(EXILE_POTION_ID, id);
         return dmg;
