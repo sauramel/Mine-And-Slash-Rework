@@ -7,6 +7,7 @@ import com.robertx22.mine_and_slash.database.data.profession.screen.AlchemyScree
 import com.robertx22.mine_and_slash.database.data.profession.screen.CookingScreen;
 import com.robertx22.mine_and_slash.database.data.profession.screen.GearCraftingScreen;
 import com.robertx22.mine_and_slash.database.data.profession.screen.InfusingScreen;
+import com.robertx22.mine_and_slash.database.data.runewords.RunewordRecipe;
 import com.robertx22.mine_and_slash.database.registry.ExileDB;
 import com.robertx22.mine_and_slash.mmorpg.SlashRef;
 import com.robertx22.mine_and_slash.mmorpg.registers.common.SlashBlocks;
@@ -33,7 +34,7 @@ public class JeiIntegration implements IModPlugin {
     }
 
     public static HashMap<String, RecipeType<ProfessionRecipe>> map = new HashMap<>();
-    public static RecipeType<com.robertx22.mine_and_slash.database.data.runewords.RunewordRecipe> runewordsRecipeType = RecipeType.create(SlashRef.MODID, "runewords", com.robertx22.mine_and_slash.database.data.runewords.RunewordRecipe.class);
+    public static RecipeType<RunewordRecipe> runewordsRecipeType = RecipeType.create(SlashRef.MODID, "runewords", RunewordRecipe.class);
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
