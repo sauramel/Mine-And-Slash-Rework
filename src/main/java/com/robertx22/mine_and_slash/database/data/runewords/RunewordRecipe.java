@@ -39,11 +39,7 @@ public class RunewordRecipe implements IAutoLocName {
 
         VanillaUTIL.REGISTRY.items().getAll().forEach(item -> {
             for (String slot : slots) {
-                var gearSlot = GearSlot.getSlotOf(item);
-                if (gearSlot == null) {
-                    continue;
-                }
-                if (gearSlot.id.equals(slot)) {
+                if (GearSlot.isItemTypeOfThisSlot(item, slot)) {
                     slotToItemsMap.get(slot).add(new ItemStack(item));
                 }
             }
