@@ -233,7 +233,7 @@ public class StatSoulData implements ICommonDataItem<GearRarity>, ISettableLevel
         }
 
         if (this.gear != null) {
-            if (GearSlot.isItemOfThisSlot(gear.gear.GetBaseGearType().getGearSlot(), stack.getItem())) {
+            if (GearSlot.isItemOfThisSlot(gear.gear.GetBaseGearType().getGearSlot(), stack)) {
                 return ExplainedResult.success();
             } else {
                 return ExplainedResult.failure(Chats.NOT_MATCHING_GEAR_SLOT.locName());

@@ -20,7 +20,6 @@ import net.minecraft.world.item.*;
 import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.HashMap;
-import java.util.stream.Stream;
 
 public class GearSlot implements JsonExileRegistry<GearSlot>, IAutoGson<GearSlot>, IAutoLocName {
 
@@ -72,10 +71,6 @@ public class GearSlot implements JsonExileRegistry<GearSlot>, IAutoGson<GearSlot
 
     public static GearSlot getSlotOf(ItemStack stack) {
         Item item = stack.getItem();
-        return getSlotOf(item, stack.getTags());
-    }
-
-    public static GearSlot getSlotOf(Item item, Stream<TagKey<Item>> tags) {
         if (CACHED.containsKey(item)) {
             return CACHED.get(item);
         }
@@ -85,7 +80,7 @@ public class GearSlot implements JsonExileRegistry<GearSlot>, IAutoGson<GearSlot
         }
 
         for (GearSlot slot : ExileDB.GearSlots().getList()) {
-            if (isItemOfThisSlot(slot, item, tags)) {
+            if (isItemOfThisSlot(slot, stack)) {
                 CACHED.put(item, slot);
                 return slot;
             }
@@ -96,12 +91,9 @@ public class GearSlot implements JsonExileRegistry<GearSlot>, IAutoGson<GearSlot
         return null;
     }
 
-    public static boolean isItemOfThisSlot(GearSlot gearSlot, Item item) {
-        return isItemOfThisSlot(gearSlot, item, Stream.empty());
-    }
-
     // has to use ugly stuff like this cus datapacks.
-    public static boolean isItemOfThisSlot(GearSlot slot, Item item, Stream<TagKey<Item>> tags) {
+    public static boolean isItemOfThisSlot(GearSlot slot, ItemStack stack) {
+        Item item = stack.getItem();
         if (item == Items.AIR) {
             return false;
         }
@@ -137,7 +129,7 @@ public class GearSlot implements JsonExileRegistry<GearSlot>, IAutoGson<GearSlot
                 }
             } else {
 
-                if (tags.anyMatch(t -> t.equals(slot.getItemTag()))) {
+                if (stack.is(slot.getItemTag())) {
                     return true;
                 }
 
