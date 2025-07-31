@@ -8,6 +8,7 @@ import com.robertx22.mine_and_slash.database.data.stats.Stat;
 import com.robertx22.mine_and_slash.database.data.stats.StatScaling;
 import com.robertx22.mine_and_slash.database.data.stats.datapacks.test.DataPackStatAccessor;
 import com.robertx22.mine_and_slash.database.data.stats.priority.StatPriority;
+import com.robertx22.mine_and_slash.saveclasses.unit.ResourceType;
 import com.robertx22.mine_and_slash.tags.all.SpellTags;
 import com.robertx22.mine_and_slash.tags.imp.SpellTag;
 import com.robertx22.mine_and_slash.uncommon.effectdatas.DamageEvent;
@@ -149,6 +150,20 @@ public class DefenseStats {
             .addEffect(StatEffects.Layers.ADDITIVE_DAMAGE_PERCENT)
             .setLocName(x -> x.locNameForLangFile() + " Damage Taken")
             .setLocDesc(x -> "")
+            .modifyAfterDone(x -> {
+                x.is_perc = true;
+            })
+            .build();
+
+    public static DataPackStatAccessor<EmptyAccessor> MISSING_MAGIC_SHIELD_DEFENSE_PER_5 = DatapackStatBuilder
+            .ofSingle("missing_magic_shield_dmg_received_per_10", Elements.Physical)
+            .worksWithEvent(DamageEvent.ID)
+            .setPriority(StatPriority.Damage.DAMAGE_LAYERS)
+            .setSide(EffectSides.Target)
+            .addEffect(StatEffects.MISSING_RESOURCE_SCALING.get(
+                    new StatEffects.ResourceScalingConfig(ResourceType.magic_shield, 10)))
+            .setLocName(x -> "Damage Received per 10% Missing Magic Shield")
+            .setLocDesc(x -> "Gain " + Stat.VAL1 + "% Damage Received for every 10% of Magic Shield that is missing.")
             .modifyAfterDone(x -> {
                 x.is_perc = true;
             })

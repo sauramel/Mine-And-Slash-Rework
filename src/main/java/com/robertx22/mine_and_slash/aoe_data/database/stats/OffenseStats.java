@@ -563,6 +563,22 @@ public class OffenseStats {
             })
             .build();
 
+    // Example: Missing Mana Damage (1% More damage per 10% missing mana)
+    public static DataPackStatAccessor<EmptyAccessor> MISSING_MANA_DAMAGE_PER_10 = DatapackStatBuilder
+            .ofSingle("missing_mana_dmg_per_10", Elements.Physical)
+            .worksWithEvent(DamageEvent.ID)
+            .setPriority(StatPriority.Damage.DAMAGE_LAYERS)
+            .setUsesMoreMultiplier()
+            .setSide(EffectSides.Source)
+            .addEffect(StatEffects.MISSING_RESOURCE_SCALING.get(
+                    new StatEffects.ResourceScalingConfig(ResourceType.mana, 10f)))
+            .setLocName(x -> "More Damage per 10% Missing Mana")
+            .setLocDesc(x -> "Gain " + Stat.VAL1 + "% More Damage for every 10% of Mana that is missing.")
+            .modifyAfterDone(x -> {
+                x.is_perc = true;
+            })
+            .build();
+
 
     public static void init() {
 

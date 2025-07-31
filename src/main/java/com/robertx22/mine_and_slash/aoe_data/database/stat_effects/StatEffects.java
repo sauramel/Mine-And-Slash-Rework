@@ -7,6 +7,7 @@ import com.robertx22.mine_and_slash.aoe_data.database.spells.schools.ProcSpells;
 import com.robertx22.mine_and_slash.aoe_data.database.spells.schools.WaterSpells;
 import com.robertx22.mine_and_slash.aoe_data.database.stats.base.EffectCtx;
 import com.robertx22.mine_and_slash.database.data.spells.components.actions.PositionSource;
+import com.robertx22.mine_and_slash.uncommon.effectdatas.rework.action.MissingResourceScalingEffect;
 import com.robertx22.mine_and_slash.database.data.stats.layers.StatLayers;
 import com.robertx22.mine_and_slash.database.data.stats.types.resources.mana.Mana;
 import com.robertx22.mine_and_slash.mmorpg.MMORPG;
@@ -19,7 +20,9 @@ import com.robertx22.mine_and_slash.uncommon.effectdatas.rework.number_provider.
 import com.robertx22.mine_and_slash.uncommon.interfaces.EffectSides;
 import com.robertx22.mine_and_slash.uncommon.utilityclasses.AllyOrEnemy;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class StatEffects implements ExileRegistryInit {
 
@@ -80,6 +83,18 @@ public class StatEffects implements ExileRegistryInit {
             ResourceType.values()
             , x -> new RestoreResourceAction("leech_" + x.id, NumberProvider.ofPercentOfDataNumber(EventData.NUMBER), x, RestoreType.leech)
     );
+
+
+    // Logic for missing resource percentage
+    public static DataHolder<ResourceScalingConfig, StatEffect> MISSING_RESOURCE_SCALING = new DataHolder<>(
+            ResourceScalingConfig.getAllConfigs(),
+            x -> new MissingResourceScalingEffect(
+                    "missing_" + x.resource.id + "_scaling_" + x.scalingPer,
+                    x.resource,
+                    x.scalingPer
+            )
+    );
+
 
     public static DataHolder<EffectCtx, StatEffect> GIVE_EFFECT_TO_SOURCE_30_SEC = new DataHolder<>(
             Arrays.asList(
@@ -186,4 +201,53 @@ public class StatEffects implements ExileRegistryInit {
             }
         }
     }
+
+
+    // Resource scaling config for missing resource percentage
+    // This is used to define how much stat to apply based on the percentage of missing resource
+// ... (rest of the file unchanged)
+
+    public static class ResourceScalingConfig {
+        public ResourceType resource;
+        public float scalingPer; // per X% missing resource
+
+        public ResourceScalingConfig(ResourceType resource, float scalingPer) {
+            this.resource = resource;
+            this.scalingPer = scalingPer;
+        }
+
+        public String GUID() {
+            return "missing_" + resource.id + "_scaling_" + scalingPer;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ResourceScalingConfig that = (ResourceScalingConfig) o;
+            return Float.compare(that.scalingPer, scalingPer) == 0 &&
+                    resource == that.resource;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = resource != null ? resource.hashCode() : 0;
+            result = 31 * result + Float.hashCode(scalingPer);
+            return result;
+        }
+
+        public static List<ResourceScalingConfig> getAllConfigs() {
+            List<ResourceScalingConfig> configs = new ArrayList<>();
+            ResourceType[] resources = {ResourceType.mana, ResourceType.blood, ResourceType.magic_shield, ResourceType.health, ResourceType.energy};
+            float[] scalings = {1f, 2f, 5f, 10f}; // per 1%, 2%, 5%, 10% missing
+
+            for (ResourceType resource : resources) {
+                for (float scaling : scalings) {
+                    configs.add(new ResourceScalingConfig(resource, scaling));
+                }
+            }
+            return configs;
+        }
+    }
 }
+
