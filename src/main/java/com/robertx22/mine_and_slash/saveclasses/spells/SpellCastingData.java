@@ -235,7 +235,10 @@ public class SpellCastingData {
 
     public void onSpellInputPressed(int number) {
         if (number != -1 && number != spellInputNumber) {
-            spellInputBuffer.add(new SpellInputBufferEntry(number));
+            // Cap size to prevent DoS
+            if (spellInputBuffer.size() < 10) {
+                spellInputBuffer.add(new SpellInputBufferEntry(number));
+            }
         }
         spellInputNumber = number;
         spellInputTimeoutTicks = 8;
