@@ -227,8 +227,13 @@ public class SpellCastingData {
     public boolean tryStartSpellCast(Player player, Spell spell) {
 
         var data = Load.player(player);
+        var cds = Load.Unit(player).getCooldowns();
 
         if (player.isBlocking() || player.swinging) {
+            return false;
+        }
+
+        if (cds.isOnCooldown("global_cooldown")) {
             return false;
         }
 
@@ -248,18 +253,17 @@ public class SpellCastingData {
                 setToCast(c);
                 spell.spendResources(c);
 
+                // Limit global cooldown to spell cooldown to allow rapid fire spells
+                int gcd = Math.min(GameBalanceConfig.get().GLOBAL_COOLDOWN_TICKS, spell.getCooldownTicks(c));
+                cds.setOnCooldown("global_cooldown", gcd);
+
                 data.playerDataSync.setDirty();
                 return true;
-            } else {
-
-                var cds = Load.Unit(player).getCooldowns();
-
-                if (!cds.isOnCooldown("spell_fail")) {
-                    cds.setOnCooldown("spell_fail", 40);
-                    if (can.answer != null) {
-                        if (Load.Unit(player).getLevel() < 15 || Load.player(player).config.isConfigEnabled(PlayerConfigData.Config.CAST_FAIL)) {
-                            player.sendSystemMessage(Chats.CAST_FAILED.locName().append(can.answer));
-                        }
+            } else if (!cds.isOnCooldown("spell_fail")) {
+                cds.setOnCooldown("spell_fail", 40);
+                if (can.answer != null) {
+                    if (Load.Unit(player).getLevel() < 15 || Load.player(player).config.isConfigEnabled(PlayerConfigData.Config.CAST_FAIL)) {
+                        player.sendSystemMessage(Chats.CAST_FAILED.locName().append(can.answer));
                     }
                 }
             }
