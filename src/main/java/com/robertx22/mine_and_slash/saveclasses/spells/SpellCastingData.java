@@ -10,7 +10,9 @@ import com.robertx22.mine_and_slash.database.data.exile_effects.ExileEffectInsta
 import com.robertx22.mine_and_slash.database.data.game_balance_config.GameBalanceConfig;
 import com.robertx22.mine_and_slash.database.data.spells.components.Spell;
 import com.robertx22.mine_and_slash.database.data.spells.entities.CalculatedSpellData;
+import com.robertx22.mine_and_slash.database.data.spells.spell_classes.CastingWeapon;
 import com.robertx22.mine_and_slash.database.data.spells.spell_classes.bases.SpellCastContext;
+import com.robertx22.mine_and_slash.database.data.spells.spell_classes.bases.SpellPredicates;
 import com.robertx22.mine_and_slash.database.data.stats.types.LearnSpellStat;
 import com.robertx22.mine_and_slash.database.data.stats.types.MaxAllSpellLevels;
 import com.robertx22.mine_and_slash.database.data.stats.types.MaxSpellLevel;
@@ -426,7 +428,12 @@ public class SpellCastingData {
                     }
 
                     if (!spell.getConfig().castingWeapon.predicate.predicate.test(player)) {
-                        return ExplainedResult.failure(Chats.WRONG_CASTING_WEAPON.locName());
+                        // If the spell requires a mage weapon and the player is a battlemage, allow casting
+                        if (spell.getConfig().castingWeapon == CastingWeapon.MAGE_WEAPON && data.getUnit().isBattlemage()) {
+                            // Do nothing, allow casting
+                        } else {
+                            return ExplainedResult.failure(Chats.WRONG_CASTING_WEAPON.locName());
+                        }
                     }
 
                     if (!wep.canPlayerWear(ctx.data)) {

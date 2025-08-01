@@ -13,6 +13,7 @@ import com.robertx22.mine_and_slash.database.data.stats.types.resources.energy.E
 import com.robertx22.mine_and_slash.database.data.stats.types.resources.health.Health;
 import com.robertx22.mine_and_slash.database.data.stats.types.resources.magic_shield.MagicShield;
 import com.robertx22.mine_and_slash.database.data.stats.types.resources.mana.Mana;
+import com.robertx22.mine_and_slash.database.data.stats.types.special.BattlemageUser;
 import com.robertx22.mine_and_slash.database.registry.ExileDB;
 import com.robertx22.mine_and_slash.mmorpg.SlashRef;
 import com.robertx22.mine_and_slash.uncommon.interfaces.data_items.IRarity;
@@ -72,6 +73,10 @@ public class Unit {
 
     public boolean isBloodMage() {
         return getCalculatedStat(BloodUser.getInstance()).getValue() > 0;
+    }
+
+    public boolean isBattlemage() {
+        return getCalculatedStat(BattlemageUser.getInstance()).getValue() > 0;
     }
 
     public void clearStats() {

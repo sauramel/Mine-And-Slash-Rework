@@ -41,6 +41,7 @@ import com.robertx22.mine_and_slash.database.data.stats.types.resources.magic_sh
 import com.robertx22.mine_and_slash.database.data.stats.types.resources.magic_shield.MagicShieldRegen;
 import com.robertx22.mine_and_slash.database.data.stats.types.resources.mana.Mana;
 import com.robertx22.mine_and_slash.database.data.stats.types.resources.mana.ManaRegen;
+import com.robertx22.mine_and_slash.database.data.stats.types.special.BattlemageUser;
 import com.robertx22.mine_and_slash.database.data.stats.types.spirit.AuraCapacity;
 import com.robertx22.mine_and_slash.database.data.stats.types.spirit.AuraEffect;
 import com.robertx22.mine_and_slash.database.data.stats.types.summon.GolemSpellChance;
@@ -149,6 +150,7 @@ public class StatsRegister implements ExileRegistryInit {
                     add(ExtraMobDropsStat.getInstance());
                     add(BonusExp.getInstance());
                     add(DamageTakenToMana.getInstance());
+                    add(BattlemageUser.getInstance());
 
                     add(new UnknownStat());
 

@@ -341,6 +341,25 @@ public class ResourceStats {
             })
             .build();
 
+    // Example: Health Regen based on Missing Health (1% regen per 2% missing health)
+    public static DataPackStatAccessor<EmptyAccessor> HEALTH_REGEN_ON_MISSING_HP = DatapackStatBuilder
+            .ofSingle("missing_hp_health_regen_per_2", Elements.ALL)
+            .worksWithEvent(RestoreResourceEvent.ID)
+            .setPriority(StatPriority.Damage.DAMAGE_LAYERS)
+            .setSide(EffectSides.Source)
+            .addCondition(StatConditions.IS_RESOURCE.get(ResourceType.health))
+            .addCondition(StatConditions.IS_RESTORE_TYPE.get(RestoreType.regen))
+            .addEffect(StatEffects.MISSING_RESOURCE_SCALING.get(
+                    new StatEffects.ResourceScalingConfig(ResourceType.health, 2f)))
+            .setLocName(x -> "Health Regen per 2% Missing Health")
+            .setLocDesc(x -> "Gain " + Stat.VAL1 + "% Health Regen for every 2% of Health that is missing.")
+            .modifyAfterDone(x -> {
+                x.is_perc = true;
+                x.format = ChatFormatting.GREEN.getName();
+                x.group = Stat.StatGroup.RESTORATION;
+            })
+            .build();
+
     public static void init() {
 
     }

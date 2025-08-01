@@ -7,6 +7,7 @@ import com.robertx22.mine_and_slash.aoe_data.database.stats.ResourceStats;
 import com.robertx22.mine_and_slash.aoe_data.database.stats.SpellChangeStats;
 import com.robertx22.mine_and_slash.aoe_data.database.unique_gears.UniqueGearBuilder;
 import com.robertx22.mine_and_slash.database.data.StatMod;
+import com.robertx22.mine_and_slash.database.data.spells.components.Spell;
 import com.robertx22.mine_and_slash.database.data.stats.types.ailment.AilmentChance;
 import com.robertx22.mine_and_slash.database.data.stats.types.gear_base.GearDamage;
 import com.robertx22.mine_and_slash.uncommon.enumclasses.Elements;
@@ -54,7 +55,7 @@ public class StaffUniques implements ExileRegistryInit {
                 ))
                 .build();
 
-        UniqueGearBuilder.of("new_dawn_flame", "Flame of new Dawn", BaseGearTypes.STAFF)
+        UniqueGearBuilder.of("new_dawn_flame", "Flame of New Dawn", BaseGearTypes.STAFF)
                 .stats(Arrays.asList(
                         new StatMod(50, 50, GearDamage.getInstance(), ModType.PERCENT),
                         new StatMod(50, 100, OffenseStats.ELEMENTAL_DAMAGE.get(Elements.Fire)),
@@ -62,7 +63,6 @@ public class StaffUniques implements ExileRegistryInit {
                         new StatMod(10, 25, OffenseStats.AREA_DAMAGE.get())
                 ))
                 .build();
-
 
     }
 }
