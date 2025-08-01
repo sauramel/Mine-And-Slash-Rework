@@ -82,15 +82,7 @@ public class SpellConfiguration {
         this.charge_regen = ticksToRegen;
         this.charges = charges;
         this.charge_name = name;
-
-
-        if (ticksToRegen > (20 * 30)) {
-            this.cooldown_ticks = 0; // we force the cooldown to be the same for all spells with charges so it feels consistent and good
-        } else {
-            this.cooldown_ticks = 0; // we force the cooldown to be the same for all spells with charges so it feels consistent and good
-        }
-
-
+        this.cooldown_ticks = 3; // we force the cooldown to be the same for all spells with charges so it feels consistent and good
         return this;
     }
 
