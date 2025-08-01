@@ -4,6 +4,7 @@ import com.robertx22.library_of_exile.main.Packets;
 import com.robertx22.library_of_exile.util.ExplainedResult;
 import com.robertx22.mine_and_slash.a_libraries.player_animations.PlayerAnimations;
 import com.robertx22.mine_and_slash.capability.entity.EntityData;
+import com.robertx22.mine_and_slash.capability.player.data.PlayerConfigData;
 import com.robertx22.mine_and_slash.config.forge.compat.CompatConfig;
 import com.robertx22.mine_and_slash.database.data.exile_effects.ExileEffect;
 import com.robertx22.mine_and_slash.database.data.exile_effects.ExileEffectInstanceData;
@@ -32,9 +33,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -207,6 +211,16 @@ public class SpellCastingData {
         }
     }
 
+    private static class SpellInputBufferEntry {
+        public int number;
+        public int ticksLeft;
+
+        public SpellInputBufferEntry(int number) {
+            this.number = number;
+            this.ticksLeft = 5;
+        }
+    }
+
     public int castTickLeft = 0;
     public int castTicksDone = 0;
     public int spellTotalCastTicks = 0;
@@ -214,6 +228,76 @@ public class SpellCastingData {
     public Boolean casting = false;
     public ChargeData charges = new ChargeData();
 
+    // Spell inputs to continuously attempt
+    transient List<SpellInputBufferEntry> spellInputBuffer = new LinkedList<>();
+    // The hotbar index of the spell key the client is holding
+    transient int spellInputNumber = -1;
+    // How many ticks left without another packet before we stop casting
+    transient int spellInputTimeoutTicks = 0;
+
+    public void onSpellInputPressed(int number) {
+        if (number != -1 && number != spellInputNumber) {
+            // Cap size to prevent DoS
+            if (spellInputBuffer.size() < 10) {
+                spellInputBuffer.add(new SpellInputBufferEntry(number));
+            }
+        }
+        spellInputNumber = number;
+        spellInputTimeoutTicks = 8;
+    }
+
+    public boolean tryStartSpellCast(Player player, Spell spell) {
+
+        var data = Load.player(player);
+        var cds = Load.Unit(player).getCooldowns();
+
+        if (player.isBlocking() || player.swinging) {
+            return false;
+        }
+
+        if (cds.isOnCooldown("global_cooldown")) {
+            return false;
+        }
+
+        if (spell != null) {
+
+            var can = canCast(spell, player);
+
+            if (can.can) {
+
+                ItemStack wep = player.getMainHandItem();
+
+                if (!wep.isEmpty() && !RepairUtils.isItemBroken(wep)) {
+                    wep.hurt(1, player.getRandom(), (ServerPlayer) player);
+                }
+
+                SpellCastContext c = new SpellCastContext(player, 0, spell);
+                setToCast(c);
+                spell.spendResources(c);
+
+                // Limit global cooldown to spell cooldown to allow rapid fire spells
+                int gcd = Math.min(GameBalanceConfig.get().GLOBAL_COOLDOWN_TICKS, spell.getCooldownTicks(c));
+                cds.setOnCooldown("global_cooldown", gcd);
+
+                data.playerDataSync.setDirty();
+                return true;
+            } else if (!cds.isOnCooldown("spell_fail")) {
+                cds.setOnCooldown("spell_fail", 40);
+                if (can.answer != null) {
+                    if (Load.Unit(player).getLevel() < 15 || Load.player(player).config.isConfigEnabled(PlayerConfigData.Config.CAST_FAIL)) {
+                        player.sendSystemMessage(Chats.CAST_FAILED.locName().append(can.answer));
+                    }
+                }
+            }
+
+        }
+        return false;
+    }
+
+    public boolean tryStartSpellCast(Player player, int number) {
+        Spell spell = Load.player(player).getSkillGemInventory().getHotbarGem(number).getSpell();
+        return tryStartSpellCast(player, spell);
+    }
 
     public void cancelCast(LivingEntity entity) {
         try {
@@ -252,11 +336,44 @@ public class SpellCastingData {
 
     transient static Spell lastSpell = null;
 
+    private void processSpellInputs(Player player) {
+
+        if (spellInputTimeoutTicks > 0) {
+            spellInputTimeoutTicks--;
+        } else {
+            // client stopped responding, don't cast forever
+            spellInputNumber = -1;
+        }
+
+        // Prune input buffer
+        for (Iterator<SpellInputBufferEntry> iterator = spellInputBuffer.iterator(); iterator.hasNext(); ) {
+            if (iterator.next().ticksLeft-- == 0) {
+                iterator.remove();
+            }
+        }
+
+        // See if any buffered inputs succeed
+        for (Iterator<SpellInputBufferEntry> iterator = spellInputBuffer.iterator(); iterator.hasNext(); ) {
+            if (tryStartSpellCast(player, iterator.next().number)) {
+                iterator.remove();
+                return;
+            }
+        }
+
+        // If not, try held input
+        if (spellInputNumber != -1) {
+            tryStartSpellCast(player, spellInputNumber);
+        }
+    }
+
     public void onTimePass(LivingEntity entity) {
 
-        try {
+        if (entity instanceof ServerPlayer player) {
+            processSpellInputs(player);
+        }
 
-            if (isCasting()) {
+        if (isCasting()) {
+            try {
                 Spell spell = this.calcSpell.getSpell();
 
                 SpellCastContext ctx = new SpellCastContext(entity, castTicksDone, spell);
@@ -291,15 +408,13 @@ public class SpellCastingData {
 
                     this.calcSpell = null;
                 }
-            } else {
-
-                lastSpell = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+                this.cancelCast(entity);
+                // cancel when error, cus this is called on tick, so it doesn't crash servers when 1 spell fails
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            this.cancelCast(entity);
-            // cancel when error, cus this is called on tick, so it doesn't crash servers when 1 spell fails
+        } else {
+            lastSpell = null;
         }
     }
 
