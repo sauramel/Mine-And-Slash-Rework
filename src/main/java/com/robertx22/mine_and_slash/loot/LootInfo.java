@@ -231,7 +231,7 @@ public class LootInfo {
                 java.util.List<Player> teamMembers = TeamUtils.getOnlineTeamMembersInRange(player);
                 int partyBonus = teamMembers.size() - 1;
                 if (partyBonus > 0) {
-                    float teamBonus = (float) (1.0f + (partyBonus * ServerContainer.get().PARTY_DROP_BONUS.get()));
+                    float teamBonus = (float) (1.0f + Math.min(partyBonus, 3) * ServerContainer.get().PARTY_DROP_BONUS.get());
                     lootMods.add(new LootModifier(LootModifierEnum.TEAM_BONUS, teamBonus));
                 }
             }
